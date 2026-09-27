@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Convite Especial</title>
+  <!-- Canvas Confetti para fogos de artifício -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      /* Fundo com gradiente Azul Ciano */
+      background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+      overflow: hidden;
+    }
+
+    /* Estilo da imagem do Emoji acima do card */
+    .emoji-img {
+      max-width: 250px;
+      height: auto;
+      margin-bottom: 20px;
+      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+    }
+
+    h1 {
+      color: #0077b6;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      min-height: 60px;
+      position: relative;
+    }
+
+    button {
+      padding: 12px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+      user-select: none;
+    }
+
+    #btnSim {
+      background-color: #28a745;
+      color: white;
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    #btnSim:hover {
+      transform: scale(1.1);
+      background-color: #218838;
+    }
+
+    #btnNao {
+      background-color: #dc3545;
+      color: white;
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 350px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: popIn 0.3s ease-out forwards;
+    }
+
+    .modal-content h2 {
+      color: #28a745;
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    .modal-content p {
+      color: #555;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Imagem Emoji colocada um pouco acima do card principal -->
+  <img src="Emoji.png" alt="Emoji" class="emoji-img" />
+
+  <div class="card">
+    <h1>Quer sair comigo?</h1>
+    <div class="btn-container">
+      <button id="btnSim">SIM</button>
+      <button id="btnNao">NÃO</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <h2>Parabéns! 🎉</h2>
+      <p>Você fez a escolha certa e irá sair comigo por livre e expontânea vontade, esolha o dia e o local, de prefrência sua casa!</p>
+      <button onclick="location.reload()" style="background-color: #0077b6; color: white;">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    const btnNao = document.getElementById('btnNao');
+    const btnSim = document.getElementById('btnSim');
+    const modal = document.getElementById('modal');
+
+    // Move o botão "NÃO" para uma posição aleatória na tela SOMENTE ao clicar ou tocar nele
+    function moverBotaoNao(e) {
+      if (e) e.preventDefault(); // Impede o clique padrão
+
+      const padding = 20;
+      const maxX = window.innerWidth - btnNao.offsetWidth - padding;
+      const maxY = window.innerHeight - btnNao.offsetHeight - padding;
+
+      const randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
+      const randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+
+      btnNao.style.position = 'fixed';
+      btnNao.style.left = `${randomX}px`;
+      btnNao.style.top = `${randomY}px`;
+    }
+
+    // Eventos de clique e toque no celular
+    btnNao.addEventListener('click', moverBotaoNao);
+    btnNao.addEventListener('touchstart', moverBotaoNao);
+
+    // Ação ao clicar em "SIM"
+    btnSim.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      soltarFogosEBaloes();
+    });
+
+    function soltarFogosEBaloes() {
+      const duration = 5 * 1000;
+      const animationEnd = Date.now() + duration;
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+
+        // Disparo de confetti/fogos
+        confetti({
+          particleCount: particleCount,
+          startVelocity: 30,
+          spread: 360,
+          origin: { x: Math.random(), y: Math.random() - 0.2 }
+        });
+      }, 250);
+    }
+  </script>
+</body>
+</html>
